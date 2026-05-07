@@ -1,26 +1,34 @@
-from flask import Blueprint, request, jsonify, render_template, redirect, url_for
+from flask import Blueprint, request, redirect, url_for, flash, render_template
 from flask_login import login_user, logout_user, login_required
-from models import Seller
+from services.auth_service import AuthService
 
-auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
+auth_bp = Blueprint("auth", __name__)
 
-@auth_bp.route('/login', methods=['GET', 'POST'])
+
+@auth_bp.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == 'POST':
-        data = request.get_json() if request.is_json else request.form
-        username = data.get('username')
-        password = data.get('password')
-        seller = Seller.query.filter_by(username=username).first()
-        if seller and seller.check_password(password):
-            login_user(seller)
-            if request.is_json:
-                return jsonify({"message": "Login berhasil", "shop": seller.shop_name})
-            return redirect(url_for('seller.dashboard'))
-        return jsonify({"error": "Username/password salah"}), 401
-    return render_template('login.html')
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
 
-@auth_bp.route('/logout')
+        user = AuthService.login(username, password)
+        if user:
+            login_user(user)
+            return redirect(url_for("admin.dashboard"))
+        else:
+            flash("Username atau password salah.", "danger")
+
+    return render_template("login.html")  # Asumsi Anda memiliki file template ini
+
+
+@auth_bp.route("/logout")
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('buyer.home'))
+    return redirect(url_for("auth.login"))
+
+
+@auth_bp.route("/forgot", methods=["GET", "POST"])
+def forgot_password():
+    # Stub untuk fitur lupa password
+    return "Halaman Lupa Password"
