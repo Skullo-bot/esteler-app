@@ -24,7 +24,7 @@
 
 ## ⭐ About The Project
 
-Es Teler
+Es Teler App
 
 ## 📋 Feature
 
@@ -32,11 +32,29 @@ Es Teler
   - [ ] Advanced Doctor Search : Patients can filter doctors by Polyclinic, Day, and Time.
 - [ ] 📝 Data Management for Admin
   - [ ] Doctor Management
+- [ ] 🔐 Autentikasi & Akun (Auth)
+  - [ ] Login & Logout : Akses masuk dan keluar sistem.
+  - [ ] Registrasi Akun : Pendaftaran pengguna baru.
+  - [ ] Lupa & Reset Password : Fitur pemulihan kata sandi (menggunakan token).
+
+- [ ] 🛒 Fitur Pelanggan (Customer)
+  - [ ] Katalog Menu : Menampilkan daftar menu es teler yang sedang aktif beserta detailnya (deskripsi, harga, gambar).
+  - [ ] Pencarian Menu : Fitur untuk mencari menu spesifik berdasarkan kata kunci.
+  - [ ] Rekomendasi Pintar : Menampilkan saran/rekomendasi menu berdasarkan match score atau best sellers.
+  - [ ] Keranjang Belanja (Cart) : Fitur penampungan sementara untuk menambah, mengubah kuantitas, menghapus item, hingga mengosongkan keranjang (berbasis sesi).
+  - [ ] Checkout / Pre-order : Mengubah isi keranjang menjadi pesanan resmi.
+  - [ ] Lacak Pesanan : Pelanggan dapat melacak status pesanan mereka (menunggu, dimasak, selesai, dibatalkan) menggunakan kode pesanan (order code).
+
+- [ ] ⚙️ Fitur Admin & Operasional
+  - [ ] Dashboard Analitik : Menampilkan ringkasan metrik penting seperti total pendapatan, total pesanan, pelanggan baru, skor kepuasan, tren pendapatan mingguan, dan daftar menu terlaris.
+  - [ ] Manajemen Menu (CRUD) : Fitur bagi admin untuk menambah menu baru, mengubah data menu, menghapus, serta menyalakan/mematikan status menu (toggle active).
+  - [ ] Manajemen Pesanan : Melihat seluruh daftar pesanan masuk, lalu mengubah statusnya (memproses, menyelesaikan, atau membatalkan pesanan).
+  - [ ] Cetak Struk / Resi : Fitur untuk men-generate dan mengunduh resi pesanan (receipt).
+  - [ ] Ekspor Laporan : Mengunduh data laporan penjualan berdasarkan rentang waktu tertentu ke dalam format file PDF atau CSV.
 
 ## ⚡ Tech Stack
 
 - [![Flask][Flask.py]][Flask-url]
-- [![Javascript][Javascript]][AzureSQL-url]
 - [![TailwindCSS][Tailwind]][Tailwind-url]
 
 <!-- GETTING STARTED -->
@@ -54,17 +72,8 @@ Before you begin, ensure you have met the following requirements:
    Windows (Recommended for SQL Server compatibility), macOS, or Linux.
 
 2. Software & Tools
-   - Python 3.10+: Make sure Python is installed and added to your system PATH.
-   - Node.js & npm: Required to compile Tailwind CSS locally.
+   - Python 3.11.0: Make sure Python is installed and added to your system PATH.
    - Git: To clone the repository.
-   - Microsoft SQL Server: You need a running instance of SQL Server (Express or Developer edition is free for local use).
-
-   - ODBC Driver 18 for SQL Server:
-     This is mandatory for the application to connect to the database.
-     [Download for Windows, macOS, and Linux here.](https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver17)
-
-   - Database Management Tool (Optional but recommended):
-     - SSMS (SQL Server Management Studio) or Azure Data Studio to visualize and manage your tables.
 
 3. Knowledge
    - Basic understanding of how to use the Command Line or Terminal.
@@ -123,6 +132,6 @@ npm run dev
 - Muhammad Nazriel Ihram 103012300269
 
 <br />
-<a href="https://github.com/yudhasw/Telkomedika-Online-Reservation/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=yudhasw/Telkomedika-Online-Reservation" alt="contrib.rocks image" />
+<a href="https://github.com/yudhasw/esteler-app/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=yudhasw/esteler.app" alt="contrib.rocks image" />
 </a>
