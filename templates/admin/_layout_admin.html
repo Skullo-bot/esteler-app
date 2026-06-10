@@ -1,47 +1,90 @@
-{% extends "base.html" %}
-
-{% block header %}
-<header class="sticky top-0 z-30 bg-cream/95 backdrop-blur border-b border-gray-200/60">
+{% extends "base.html" %} {% block header %}
+<header
+  class="sticky top-0 z-30 bg-cream/95 backdrop-blur border-b border-gray-200/60"
+>
   <div class="flex items-center justify-between px-4 py-3">
-    <div class="flex items-center gap-2">
-
-      <a href="{{ url_for('admin.dashboard') }}" class="flex items-center gap-1.5">
-        <i data-lucide="chef-hat" class="w-6 h-6 text-brand-600"></i>
-        <span class="font-bold text-lg text-brand-700">Dapur Hijrah</span>
-      </a>
-    </div>
-    <a href="{{ url_for('auth.logout') }}" title="Logout">
-      <img src="https://i.pravatar.cc/40?img=33" alt="Admin"
-           class="w-8 h-8 rounded-full border-2 border-brand-200">
+    <a
+      href="{{ url_for('admin.dashboard') }}"
+      class="flex items-center gap-1.5"
+    >
+      <i data-lucide="chef-hat" class="w-6 h-6 text-brand-600"></i>
+      <span class="font-bold text-lg text-brand-700">Dapur Hijrah</span>
     </a>
+    <div class="relative">
+      <button id="admin-menu-btn" type="button" class="block">
+        <img
+          src="https://i.pravatar.cc/40?img=33"
+          alt="Admin"
+          class="w-8 h-8 rounded-full border-2 border-brand-200"
+        />
+      </button>
+      <div
+        id="admin-menu-dropdown"
+        class="hidden absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-card border border-gray-100 py-1 z-40"
+      >
+        <div class="px-4 py-2 border-b border-gray-100">
+          <p class="text-sm font-semibold text-gray-800 truncate">
+            {{ current_user.username }}
+          </p>
+          <p class="text-xs text-gray-500">Admin</p>
+        </div>
+        <a
+          href="{{ url_for('auth.logout') }}"
+          class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+        >
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+          Logout
+        </a>
+      </div>
+    </div>
   </div>
 </header>
-{% endblock %}
-
-{% block bottom_nav %}
-{% set active = active_nav | default('home') %}
+{% endblock %} {% block bottom_nav %} {% set active = active_nav |
+default('home') %}
 <nav class="fixed bottom-0 left-0 right-0 z-30">
   <div class="max-w-md mx-auto bg-white border-t border-gray-200 px-4 py-2">
     <div class="flex justify-around items-center">
-      <a href="{{ url_for('admin.dashboard') }}"
-         class="flex flex-col items-center gap-1 py-2 px-4 rounded-xl
-                {% if active == 'home' %}bg-brand-100 text-brand-700{% else %}text-gray-500{% endif %}">
+      <a
+        href="{{ url_for('admin.dashboard') }}"
+        class="flex flex-col items-center gap-1 py-2 px-4 rounded-xl {% if active == 'home' %}bg-brand-100 text-brand-700{% else %}text-gray-500{% endif %}"
+      >
         <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
         <span class="text-xs font-semibold">Home</span>
       </a>
-      <a href="{{ url_for('admin.menu_management') }}"
-         class="flex flex-col items-center gap-1 py-2 px-4 rounded-xl
-                {% if active == 'menu' %}bg-brand-100 text-brand-700{% else %}text-gray-500{% endif %}">
+      <a
+        href="{{ url_for('admin.menu_management') }}"
+        class="flex flex-col items-center gap-1 py-2 px-4 rounded-xl {% if active == 'menu' %}bg-brand-100 text-brand-700{% else %}text-gray-500{% endif %}"
+      >
         <i data-lucide="utensils-crossed" class="w-5 h-5"></i>
         <span class="text-xs font-semibold">Menu</span>
       </a>
-      <a href="{{ url_for('admin.order_list') }}"
-         class="flex flex-col items-center gap-1 py-2 px-4 rounded-xl
-                {% if active == 'orders' %}bg-brand-100 text-brand-700{% else %}text-gray-500{% endif %}">
+      <a
+        href="{{ url_for('admin.order_list') }}"
+        class="flex flex-col items-center gap-1 py-2 px-4 rounded-xl {% if active == 'orders' %}bg-brand-100 text-brand-700{% else %}text-gray-500{% endif %}"
+      >
         <i data-lucide="receipt" class="w-5 h-5"></i>
         <span class="text-xs font-semibold">Orders</span>
       </a>
     </div>
   </div>
 </nav>
+{% endblock %} {% block scripts %}
+<script>
+  const adminMenuBtn = document.getElementById("admin-menu-btn");
+  const adminMenuDropdown = document.getElementById("admin-menu-dropdown");
+  if (adminMenuBtn && adminMenuDropdown) {
+    adminMenuBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      adminMenuDropdown.classList.toggle("hidden");
+    });
+    document.addEventListener("click", (e) => {
+      if (
+        !adminMenuDropdown.contains(e.target) &&
+        !adminMenuBtn.contains(e.target)
+      ) {
+        adminMenuDropdown.classList.add("hidden");
+      }
+    });
+  }
+</script>
 {% endblock %}
