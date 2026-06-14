@@ -381,13 +381,13 @@
 
   // Data menu — sesuaikan menu_id dengan ID di database kamu
   const dtMenus = {
-    durian:         { name: 'Es Teler Special Durian', price: 'Rp22.000', rawPrice: 22000, emoji: '🌟', desc: 'Spesial dengan durian premium', menu_id: null },
-    eskrim_reguler: { name: 'Es Teler Ice Cream Regular', price: 'Rp17.000', rawPrice: 17000, emoji: '🍦', desc: 'Es krim lembut ukuran pas', menu_id: null },
-    eskrim_jumbo:   { name: 'Es Teler Ice Cream Jumbo', price: 'Rp20.000', rawPrice: 20000, emoji: '🍦', desc: 'Es krim lembut porsi besar', menu_id: null },
-    keju_reguler:   { name: 'Es Teler Extra Cheese Regular', price: 'Rp14.000', rawPrice: 14000, emoji: '🧀', desc: 'Gurih keju di setiap suapan', menu_id: null },
-    keju_jumbo:     { name: 'Es Teler Extra Cheese Jumbo', price: 'Rp17.000', rawPrice: 17000, emoji: '🧀', desc: 'Gurih keju porsi jumbo', menu_id: null },
-    ori_reguler:    { name: 'Es Teler Ori Regular', price: 'Rp12.000', rawPrice: 12000, emoji: '🍈', desc: 'Klasik segar, pilihan hemat', menu_id: null },
-    ori_jumbo:      { name: 'Es Teler Ori Jumbo', price: 'Rp15.000', rawPrice: 15000, emoji: '🍈', desc: 'Klasik segar porsi jumbo', menu_id: null },
+    durian:         { name: 'Es Teler Special Durian', price: 'Rp22.000', rawPrice: 22000, emoji: '🌟', desc: 'Spesial dengan durian premium', menu_id: 6 },
+    eskrim_reguler: { name: 'Es Teler Ice Cream Regular', price: 'Rp17.000', rawPrice: 17000, emoji: '🍦', desc: 'Es krim lembut ukuran pas', menu_id: 9 },
+    eskrim_jumbo:   { name: 'Es Teler Ice Cream Jumbo', price: 'Rp20.000', rawPrice: 20000, emoji: '🍦', desc: 'Es krim lembut porsi besar', menu_id: 2 },
+    keju_reguler:   { name: 'Es Teler Extra Cheese Regular', price: 'Rp14.000', rawPrice: 14000, emoji: '🧀', desc: 'Gurih keju di setiap suapan', menu_id: 7 },
+    keju_jumbo:     { name: 'Es Teler Extra Cheese Jumbo', price: 'Rp17.000', rawPrice: 17000, emoji: '🧀', desc: 'Gurih keju porsi jumbo', menu_id: 10 },
+    ori_reguler:    { name: 'Es Teler Ori Regular', price: 'Rp12.000', rawPrice: 12000, emoji: '🍈', desc: 'Klasik segar, pilihan hemat', menu_id: 4 },
+    ori_jumbo:      { name: 'Es Teler Ori Jumbo', price: 'Rp15.000', rawPrice: 15000, emoji: '🍈', desc: 'Klasik segar porsi jumbo', menu_id: 8 },
   };
 
   function openDecisionTree() {
@@ -479,7 +479,7 @@
       btn.onclick = () => {
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/cart/add'; // sesuaikan dengan url_for customer.add_to_cart
+        form.action = '{{ url_for("customer.add_to_cart") }}'; // sesuaikan dengan url_for customer.add_to_cart
         form.innerHTML = `
           <input type="hidden" name="menu_id" value="${m.menu_id}">
           <input type="hidden" name="quantity" value="1">
