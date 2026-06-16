@@ -141,6 +141,12 @@ block title %}Kelola Order · Dapur Hijrah{% endblock %} {% block content %}
         </form>
         {% endif %}
 
+        <!-- Tombol Print Nota (Disabled/Warna Muda karena pesanan belum selesai) -->
+        <span class="px-3 py-2.5 bg-gray-50 text-gray-300 rounded-xl cursor-not-allowed flex items-center justify-center"
+              title="Nota hanya dapat dicetak setelah pesanan selesai">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+        </span>
+
         <form
           method="POST"
           action="{{ url_for('admin.cancel_order', order_id=order.id) }}"
@@ -195,6 +201,20 @@ block title %}Kelola Order · Dapur Hijrah{% endblock %} {% block content %}
             {{ order.total | rupiah }}
           </p>
         </div>
+
+        <!-- Tombol Print Nota di samping tombol Hapus Riwayat -->
+        {% if order.status == 'selesai' %}
+        <a href="{{ url_for('admin.print_receipt', order_id=order.id) }}" target="_blank"
+           class="p-2 bg-gray-100 text-gray-700 hover:text-gray-950 hover:bg-gray-200 rounded-lg transition-colors flex items-center justify-center"
+           title="Cetak Nota">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+        </a>
+        {% else %}
+        <span class="p-2 bg-gray-50 text-gray-300 rounded-lg cursor-not-allowed flex items-center justify-center"
+              title="Nota hanya dapat dicetak setelah pesanan selesai">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+        </span>
+        {% endif %}
 
         <form
           method="POST"
