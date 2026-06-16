@@ -2,8 +2,16 @@
 Routes Admin - panel pengelolaan penjual
 Semua route dilindungi @login_required
 """
+
 from flask import (
-    Blueprint, request, redirect, url_for, render_template, flash, jsonify, send_file
+    Blueprint,
+    request,
+    redirect,
+    url_for,
+    render_template,
+    flash,
+    jsonify,
+    send_file,
 )
 from flask_login import login_required, current_user
 
@@ -56,20 +64,24 @@ def menu_create():
     if request.method == "POST":
         try:
             image_url = request.form.get("image_url", "").strip()
-            uploaded_url = UploadService.upload_menu_image(request.files.get("image_file"))
+            uploaded_url = UploadService.upload_menu_image(
+                request.files.get("image_file")
+            )
             if uploaded_url:
                 image_url = uploaded_url
 
-            MenuService.create({
-                "name": request.form.get("name", "").strip(),
-                "description": request.form.get("description", "").strip(),
-                "price": int(request.form.get("price", 0)),
-                "category": request.form.get("category", "Original"),
-                "image_url": image_url,
-                "is_active": request.form.get("is_active") == "on",
-                "is_best_seller": request.form.get("is_best_seller") == "on",
-                "is_favorite": request.form.get("is_favorite") == "on",
-            })
+            MenuService.create(
+                {
+                    "name": request.form.get("name", "").strip(),
+                    "description": request.form.get("description", "").strip(),
+                    "price": int(request.form.get("price", 0)),
+                    "category": request.form.get("category", "Original"),
+                    "image_url": image_url,
+                    "is_active": request.form.get("is_active") == "on",
+                    "is_best_seller": request.form.get("is_best_seller") == "on",
+                    "is_favorite": request.form.get("is_favorite") == "on",
+                }
+            )
             flash("Menu berhasil ditambahkan.", "success")
             return redirect(url_for("admin.menu_management"))
         except (ValueError, KeyError) as e:
@@ -88,20 +100,25 @@ def menu_edit(menu_id):
     if request.method == "POST":
         try:
             image_url = request.form.get("image_url", menu.image_url)
-            uploaded_url = UploadService.upload_menu_image(request.files.get("image_file"))
+            uploaded_url = UploadService.upload_menu_image(
+                request.files.get("image_file")
+            )
             if uploaded_url:
                 image_url = uploaded_url
 
-            MenuService.update(menu_id, {
-                "name": request.form.get("name", "").strip(),
-                "description": request.form.get("description", "").strip(),
-                "price": int(request.form.get("price", menu.price)),
-                "category": request.form.get("category", menu.category),
-                "image_url": image_url,
-                "is_active": request.form.get("is_active") == "on",
-                "is_best_seller": request.form.get("is_best_seller") == "on",
-                "is_favorite": request.form.get("is_favorite") == "on",
-            })
+            MenuService.update(
+                menu_id,
+                {
+                    "name": request.form.get("name", "").strip(),
+                    "description": request.form.get("description", "").strip(),
+                    "price": int(request.form.get("price", menu.price)),
+                    "category": request.form.get("category", menu.category),
+                    "image_url": image_url,
+                    "is_active": request.form.get("is_active") == "on",
+                    "is_best_seller": request.form.get("is_best_seller") == "on",
+                    "is_favorite": request.form.get("is_favorite") == "on",
+                },
+            )
             flash("Menu berhasil diperbarui.", "success")
             return redirect(url_for("admin.menu_management"))
         except (ValueError, KeyError) as e:
@@ -166,7 +183,21 @@ def cancel_order(order_id):
     return redirect(request.referrer or url_for("admin.order_list"))
 
 
-# ====================== WALK-IN ORDER (sesuai SDD revisi) ======================
+@admin_bp.route("/orders/<int:order_id>/delete", methods=["POST"])
+@login_required
+def delete_order(order_id):
+    if OrderService.delete_order(order_id):
+        flash("Riwayat pesanan berhasil dihapus.", "success")
+    else:
+        flash(
+            "Gagal menghapus pesanan: Terjadi kesalahan atau data tidak ditemukan.",
+            "danger",
+        )
+
+    return redirect(url_for("admin.order_list"))
+
+
+# ====================== WALK-IN ORDER  ======================
 @admin_bp.route("/orders/walkin", methods=["GET", "POST"])
 @login_required
 def walkin_order():
@@ -185,12 +216,15 @@ def walkin_order():
             flash("Tidak ada item yang dipilih.", "danger")
             return redirect(url_for("admin.walkin_order"))
 
-        order = OrderService.create_walkin(items, {
-            "name": request.form.get("customer_name", "Walk-in"),
-            "contact": request.form.get("customer_contact"),
-            "note": request.form.get("note", ""),
-            "payment_method": request.form.get("payment_method", "TUNAI"),
-        })
+        order = OrderService.create_walkin(
+            items,
+            {
+                "name": request.form.get("customer_name", "Walk-in"),
+                "contact": request.form.get("customer_contact"),
+                "note": request.form.get("note", ""),
+                "payment_method": request.form.get("payment_method", "TUNAI"),
+            },
+        )
 
         if order:
             flash(f"Order walk-in {order.order_code} berhasil dibuat.", "success")
@@ -200,74 +234,94 @@ def walkin_order():
     menus = MenuService.get_all(active_only=True)
     return render_template("admin/walkin.html", menus=menus)
 
+
 # ====================== REPORT DOWNLOAD ======================
 @admin_bp.route("/report/download")
 @login_required
 def download_report():
     import openpyxl
     from openpyxl.styles import Font, Alignment, PatternFill
-    
+
     # 1. Ambil data order terbaru
     orders = Order.query.order_by(Order.created_at.desc()).all()
-    
+
     # 2. Buat workbook excel
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Laporan Penjualan"
-    
+
     # Header kolom
     headers = [
-        "Tanggal", "Kode Pesanan", "Nama Pelanggan", "Kontak", 
-        "Tipe Order", "Sumber", "Status", "Metode Bayar", "Menu Dipesan", "Total (Rp)"
+        "Tanggal",
+        "Kode Pesanan",
+        "Nama Pelanggan",
+        "Kontak",
+        "Tipe Order",
+        "Sumber",
+        "Status",
+        "Metode Bayar",
+        "Menu Dipesan",
+        "Total (Rp)",
     ]
     ws.append(headers)
-    
+
     # Styling header (Warna Hijau Brand)
-    header_fill = PatternFill(start_color="16A34A", end_color="16A34A", fill_type="solid")
+    header_fill = PatternFill(
+        start_color="16A34A", end_color="16A34A", fill_type="solid"
+    )
     header_font = Font(bold=True, color="FFFFFF")
     align_center = Alignment(horizontal="center", vertical="center")
-    
+
     for col in range(1, len(headers) + 1):
         cell = ws.cell(row=1, column=col)
         cell.font = header_font
         cell.fill = header_fill
         cell.alignment = align_center
-    
+
     # Isi data baris per baris
     for o in orders:
-        menu_details = ", ".join([f"{item.menu.name if item.menu else 'Menu'} ({item.quantity}x)" for item in o.items])
-        
+        menu_details = ", ".join(
+            [
+                f"{item.menu.name if item.menu else 'Menu'} ({item.quantity}x)"
+                for item in o.items
+            ]
+        )
+
         # Jika pesanan belum selesai, pendapatannya 0
         revenue = o.total if o.status and o.status.lower() == "selesai" else 0
-        
-        ws.append([
-            o.created_at.strftime("%Y-%m-%d %H:%M") if o.created_at else "-",
-            o.order_code,
-            o.customer_name or "-",
-            o.customer_contact or "-",
-            o.order_type.upper() if o.order_type else "-",
-            o.order_source,
-            o.status.upper(),
-            o.payment_method,
-            menu_details,
-            revenue
-        ])
-        
+
+        ws.append(
+            [
+                o.created_at.strftime("%Y-%m-%d %H:%M") if o.created_at else "-",
+                o.order_code,
+                o.customer_name or "-",
+                o.customer_contact or "-",
+                o.order_type.upper() if o.order_type else "-",
+                o.order_source,
+                o.status.upper(),
+                o.payment_method,
+                menu_details,
+                revenue,
+            ]
+        )
+
     # Tambahkan baris Total Pendapatan di bawah
     # Kita hitung langsung di Python agar nilainya pasti muncul tanpa perlu bergantung pada kalkulasi otomatis Excel
-    total_pendapatan = sum(o.total for o in orders if o.status and o.status.lower() == "selesai")
+    total_pendapatan = sum(
+        o.total for o in orders if o.status and o.status.lower() == "selesai"
+    )
     last_data_row = len(orders) + 1
-    
+
     ws.append(["", "", "", "", "", "", "", "", "Total Pendapatan:", total_pendapatan])
-    
+
     total_row_idx = last_data_row + 1
     ws.cell(row=total_row_idx, column=9).font = Font(bold=True)
     ws.cell(row=total_row_idx, column=10).font = Font(bold=True)
-        
+
     # Auto-adjust lebar kolom biar rapi
     for col in ws.columns:
         max_length = 0
-        column = col[0].column_letter # A, B, C, dst.
+        column = col[0].column_letter  # A, B, C, dst.
         for cell in col:
             try:
                 if cell.value and len(str(cell.value)) > max_length:
@@ -276,18 +330,18 @@ def download_report():
                 pass
         # Tambah margin sedikit
         ws.column_dimensions[column].width = max_length + 2
-        
+
     # Simpan file ke in-memory buffer (tidak perlu save ke harddisk)
     output = io.BytesIO()
     wb.save(output)
     output.seek(0)
-    
+
     # Kirim file ke browser
     return send_file(
         output,
         download_name="Laporan_Penjualan_Dapur_Hijrah.xlsx",
         as_attachment=True,
-        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 
 
@@ -296,6 +350,7 @@ def download_report():
 @login_required
 def print_receipt(order_id):
     from sqlalchemy.orm import joinedload
+
     order = (
         Order.query.options(joinedload(Order.items).joinedload(OrderItem.menu))
         .filter_by(id=order_id)
@@ -308,4 +363,3 @@ def print_receipt(order_id):
         flash("Nota hanya dapat dicetak untuk pesanan yang sudah selesai.", "warning")
         return redirect(url_for("admin.order_list"))
     return render_template("admin/receipt.html", order=order)
-

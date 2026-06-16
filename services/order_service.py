@@ -9,6 +9,7 @@ PERUBAHAN dari versi lama:
 - Eager load items+menu untuk hindari N+1
 - Transactional dengan rollback kalau ada error
 """
+
 import uuid
 from datetime import datetime, timezone
 from typing import Optional, List
@@ -16,7 +17,6 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy import func
 from models import db, Order, OrderItem, Menu
 from services.cart_service import CartService
-
 
 VALID_STATUSES = {"menunggu", "memasak", "siap", "selesai", "dibatalkan"}
 VALID_PAYMENTS = {"QRIS", "TUNAI", "COD"}
@@ -62,12 +62,14 @@ class OrderService:
                     continue
                 subtotal = item.menu.price * item.quantity
                 total += subtotal
-                order_items_data.append({
-                    "menu_id": item.menu.id,
-                    "quantity": item.quantity,
-                    "price_at_order": item.menu.price,
-                    "subtotal": subtotal,
-                })
+                order_items_data.append(
+                    {
+                        "menu_id": item.menu.id,
+                        "quantity": item.quantity,
+                        "price_at_order": item.menu.price,
+                        "subtotal": subtotal,
+                    }
+                )
 
             if total == 0:
                 return None
@@ -128,12 +130,14 @@ class OrderService:
                 qty = int(it["quantity"])
                 subtotal = menu.price * qty
                 total += subtotal
-                order_items_data.append({
-                    "menu_id": menu.id,
-                    "quantity": qty,
-                    "price_at_order": menu.price,
-                    "subtotal": subtotal,
-                })
+                order_items_data.append(
+                    {
+                        "menu_id": menu.id,
+                        "quantity": qty,
+                        "price_at_order": menu.price,
+                        "subtotal": subtotal,
+                    }
+                )
 
             if total == 0:
                 return None
@@ -241,11 +245,11 @@ class OrderService:
         """Update rata-rata rating menu yang dibeli."""
         if rating_val < 1 or rating_val > 5:
             return False
-            
+
         order = OrderService.get_by_code(order_code)
         if not order:
             return False
-            
+
         # Update rating tiap menu di order ini
         for item in order.items:
             if item.menu:
@@ -253,6 +257,27 @@ class OrderService:
                     item.menu.rating = float(rating_val)
                 else:
                     item.menu.rating = round((item.menu.rating + rating_val) / 2.0, 1)
-                    
+
         db.session.commit()
         return True
+
+    @staticmethod
+    def delete_order(order_id: int) -> bool:
+        """Menghapus pesanan beserta item di dalamnya secara permanen."""
+        # Gunakan session.get() sesuai standar SQLAlchemy 2.0 yang Anda gunakan
+        order = db.session.get(Order, order_id)
+        if not order:
+            return False
+
+        try:
+            for item in order.items:
+                db.session.delete(item)
+
+            db.session.delete(order)
+            db.session.commit()
+            return True
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error Delete Order: {e}")
+            return False

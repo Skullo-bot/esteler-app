@@ -15,20 +15,29 @@ block title %}Kelola Order · Dapur Hijrah{% endblock %} {% block content %}
     </button>
   </div>
 
+   <!-- Walk-in Quick -->
+  <a href="{{ url_for('admin.walkin_order') }}"
+     class="flex items-center justify-center gap-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white font-bold py-3 rounded-2xl shadow-soft mb-5">
+    <i data-lucide="plus-circle" class="w-5 h-5"></i>
+    Buat Order Walk-in
+  </a>
+
   <!-- Header section -->
-  <div class="flex items-start justify-between mb-4">
-    <div>
+  <div class="flex items-start justify-between gap-4 mb-4">
+    <div class="flex-1">
       <h1 class="font-bold text-gray-900">Pesanan Aktif</h1>
       <p class="text-xs text-gray-500">
         Monitor status pesanan real-time pelanggan Anda.
       </p>
     </div>
     <span
-      class="bg-amber-100 text-amber-800 px-3 py-1.5 rounded-xl text-xs font-bold"
+      class="bg-amber-100 text-amber-800 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shrink-0"
     >
       {{ active_orders | length }} Menunggu
     </span>
   </div>
+
+  
 
   <!-- Active Orders -->
   <div class="space-y-3 mb-6">
@@ -151,6 +160,64 @@ block title %}Kelola Order · Dapur Hijrah{% endblock %} {% block content %}
     <div class="bg-white rounded-2xl p-8 text-center text-gray-400 shadow-soft">
       <i data-lucide="receipt" class="w-12 h-12 mx-auto mb-2"></i>
       <p class="text-sm">Tidak ada pesanan aktif</p>
+    </div>
+    {% endfor %}
+  </div>
+  <!-- Recent Orders (history) -->
+  <h2 class="text-base font-bold text-gray-900 mb-3">Riwayat Terbaru</h2>
+  <div class="bg-white rounded-2xl shadow-soft overflow-hidden">
+    {% for order in recent_orders[:10] %}
+    <div
+      class="flex items-center gap-3 p-3 border-b border-gray-100 last:border-0"
+    >
+      <div
+        class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center font-bold text-xs text-gray-700"
+      >
+        #{{ order.id }}
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-semibold text-gray-900 truncate">
+          {{ order.customer_name or 'Walk-in' }}
+        </p>
+        <p class="text-xs text-gray-500">{{ order.order_code }}</p>
+      </div>
+
+      {% set color = order.status | status_color %}
+
+      <div class="flex items-center gap-3">
+        <div class="text-right">
+          <span
+            class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-{{ color }}-100 text-{{ color }}-700"
+          >
+            {{ order.status }}
+          </span>
+          <p class="text-xs font-bold text-gray-900 mt-1">
+            {{ order.total | rupiah }}
+          </p>
+        </div>
+
+        <form
+          method="POST"
+          action="{{ url_for('admin.delete_order', order_id=order.id) }}"
+        >
+          <button
+            type="submit"
+            class="p-2 bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            title="Hapus Riwayat"
+            onclick="
+              return confirm(
+                'Yakin ingin menghapus riwayat pesanan ini? Tindakan ini tidak dapat dibatalkan.',
+              );
+            "
+          >
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+    {% else %}
+    <div class="p-6 text-center text-gray-400">
+      <p class="text-sm">Belum ada riwayat pesanan</p>
     </div>
     {% endfor %}
   </div>
